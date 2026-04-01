@@ -1,9 +1,22 @@
--- Run this in your Supabase SQL Editor to create the user_preferences table
+-- ============================================================
+-- SpendAudit: User Preferences Setup
+-- Run this in your Supabase SQL Editor (Project > SQL Editor)
+-- ============================================================
 
--- Create user_preferences table
-CREATE TABLE IF NOT EXISTS user_preferences (
+-- Step 1: Clean up any existing objects to avoid conflicts
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+DROP TRIGGER IF EXISTS update_user_preferences_updated_at ON user_preferences;
+DROP FUNCTION IF EXISTS handle_new_user();
+DROP FUNCTION IF EXISTS update_updated_at_column();
+DROP POLICY IF EXISTS "Users can view own preferences" ON user_preferences;
+DROP POLICY IF EXISTS "Users can insert own preferences" ON user_preferences;
+DROP POLICY IF EXISTS "Users can update own preferences" ON user_preferences;
+DROP TABLE IF EXISTS user_preferences;
+
+-- Step 2: Create user_preferences table
+CREATE TABLE user_preferences (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL UNIQUE,
     currency VARCHAR(3) DEFAULT 'INR',
     language VARCHAR(10) DEFAULT 'en',
     timezone VARCHAR(50) DEFAULT 'Asia/Kolkata',
@@ -15,10 +28,9 @@ CREATE TABLE IF NOT EXISTS user_preferences (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Enable RLS (Row Level Security)
+-- Step 3: Enable RLS (Row Level Security)
 ALTER TABLE user_preferences ENABLE ROW LEVEL SECURITY;
 
--- Create policies to allow users to only access their own preferences
 CREATE POLICY "Users can view own preferences" ON user_preferences
     FOR SELECT USING (auth.uid() = user_id);
 
@@ -28,38 +40,35 @@ CREATE POLICY "Users can insert own preferences" ON user_preferences
 CREATE POLICY "Users can update own preferences" ON user_preferences
     FOR UPDATE USING (auth.uid() = user_id);
 
--- Create function to automatically update the updated_at timestamp
+-- Step 4: Auto-update updated_at on row changes
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
     NEW.updated_at = NOW();
     RETURN NEW;
 END;
-$$ language 'plpgsql';
+$$ LANGUAGE plpgsql;
 
--- Create trigger to automatically update updated_at
 CREATE TRIGGER update_user_preferences_updated_at
     BEFORE UPDATE ON user_preferences
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
--- Optional: Function to create default preferences when user signs up
+-- Step 5: Auto-create preferences row on user signup
+-- Uses EXCEPTION block so signup NEVER fails even if this insert errors
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
     INSERT INTO user_preferences (user_id, guide_progress)
-    VALUES (NEW.id, '[]'::jsonb);
+    VALUES (NEW.id, '[]'::jsonb)
+    ON CONFLICT (user_id) DO NOTHING;
+    RETURN NEW;
+EXCEPTION WHEN OTHERS THEN
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Optional: Trigger to create default preferences on user signup
 CREATE TRIGGER on_auth_user_created
     AFTER INSERT ON auth.users
     FOR EACH ROW
     EXECUTE FUNCTION handle_new_user();
-
--- Migration: Add guide_progress column to existing user_preferences table
--- Run this if the table already exists without the guide_progress column
-ALTER TABLE user_preferences 
-ADD COLUMN IF NOT EXISTS guide_progress JSONB DEFAULT '[]';

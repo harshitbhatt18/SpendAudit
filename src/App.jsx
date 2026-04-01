@@ -4,6 +4,7 @@ import Login from './Components/Login';
 import Signup from './Components/Signup';
 import {Dashboard, DashboardHome} from './Components/Dashboard';
 import ProtectedRoute from './Components/ProtectedRoute';
+import NotFound from './Components/NotFound';
 import { AuthProvider } from './contexts/AuthContext';
 import { ExpenseProvider } from './contexts/ExpenseContext.jsx';
 import TransactionHistory from './Components/SidebarComponents/TransactionHistory';
@@ -38,6 +39,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </Router>
       </ExpenseProvider>

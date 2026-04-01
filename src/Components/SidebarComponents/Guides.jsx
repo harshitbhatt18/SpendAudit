@@ -13,19 +13,13 @@ const Guides = () => {
     useEffect(() => {
         const loadProgress = async () => {
             try {
-                console.log('Loading guide progress...');
-                
-                // First, try to load from localStorage for immediate display
                 const localProgress = localStorage.getItem('expensetracker_guide_progress');
                 if (localProgress) {
                     const parsed = JSON.parse(localProgress);
-                    console.log('Loaded from localStorage:', parsed);
                     setCompletedGuides(parsed);
                 }
 
-                // Then load from Supabase if user is logged in
                 if (currentUser) {
-                    console.log('Loading from Supabase for user:', currentUser.id);
                     const { data, error } = await supabase
                         .from('user_preferences')
                         .select('guide_progress')
@@ -34,13 +28,9 @@ const Guides = () => {
 
                     if (data && data.guide_progress) {
                         const remoteProgress = data.guide_progress;
-                        console.log('Loaded from Supabase:', remoteProgress);
                         setCompletedGuides(remoteProgress);
-                        // Sync with localStorage
                         localStorage.setItem('expensetracker_guide_progress', JSON.stringify(remoteProgress));
                     } else if (!error || error.code === 'PGRST116') {
-                        // No preferences record exists yet, create one
-                        console.log('Creating new user preferences record');
                         await createUserPreferences();
                     } else {
                         console.error('Error loading from Supabase:', error);
@@ -79,15 +69,10 @@ const Guides = () => {
     // Save progress to both localStorage and Supabase
     const saveProgress = async (newProgress) => {
         try {
-            console.log('Saving progress:', newProgress);
-            
-            // Save to localStorage immediately
             localStorage.setItem('expensetracker_guide_progress', JSON.stringify(newProgress));
             setCompletedGuides(newProgress);
 
-            // Save to Supabase if user is logged in
             if (currentUser) {
-                console.log('Saving to Supabase for user:', currentUser.id);
                 const { error } = await supabase
                     .from('user_preferences')
                     .upsert({
@@ -100,8 +85,6 @@ const Guides = () => {
 
                 if (error) {
                     console.error('Error saving guide progress to Supabase:', error);
-                } else {
-                    console.log('Successfully saved to Supabase');
                 }
             }
         } catch (error) {
@@ -471,7 +454,7 @@ const Guides = () => {
                 </div>
                 
                 {/* Debug: Reset Progress Button (remove in production) */}
-                {process.env.NODE_ENV === 'development' && (
+                {import.meta.env.DEV && (
                     <button
                         onClick={clearProgress}
                         className="text-xs text-gray-400 hover:text-red-600 px-2 py-1 border border-gray-200 rounded"

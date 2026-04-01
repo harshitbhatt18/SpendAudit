@@ -5,6 +5,17 @@
 ALTER TABLE user_preferences 
 ADD COLUMN IF NOT EXISTS guide_progress JSONB DEFAULT '[]';
 
+-- Ensure user_id has a UNIQUE constraint (required for ON CONFLICT)
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint
+        WHERE conname = 'user_preferences_user_id_key'
+    ) THEN
+        ALTER TABLE user_preferences ADD CONSTRAINT user_preferences_user_id_key UNIQUE (user_id);
+    END IF;
+END $$;
+
 -- Update the handle_new_user function to include guide_progress
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS TRIGGER AS $$
