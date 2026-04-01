@@ -5,7 +5,7 @@ import Loading, { InlineLoading } from '../Loading';
 import { FiUser, FiLock, FiBell, FiEye, FiEyeOff, FiSave, FiCamera, FiMail, FiPhone, FiMapPin, FiCalendar, FiCheck, FiAlertCircle, FiTrash2 } from 'react-icons/fi';
 
 const Settings = () => {
-    const { currentUser, updateProfile, refreshUser } = useAuth();
+    const { currentUser, refreshUser } = useAuth();
     const [activeTab, setActiveTab] = useState('profile');
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -229,7 +229,7 @@ const Settings = () => {
             }
             
             showMessage('success', 'Profile updated successfully!');
-        } catch (error) {
+        } catch {
             showMessage('error', 'Failed to update profile. Please try again.');
         } finally {
             setLoading(false);
@@ -278,7 +278,7 @@ const Settings = () => {
             });
             
             showMessage('success', 'Password updated successfully!');
-        } catch (error) {
+        } catch {
             showMessage('error', 'Failed to update password. Please try again.');
         } finally {
             setLoading(false);
@@ -296,7 +296,7 @@ const Settings = () => {
             if (success) {
                 setUserPreferences(updatedPreferences);
             }
-        } catch (error) {
+        } catch {
             showMessage('error', 'Failed to save notification preferences. Please try again.');
         }
     };

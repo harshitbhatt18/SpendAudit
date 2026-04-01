@@ -14,7 +14,6 @@ const Help = () => {
         message: ''
     });
     const [contactSubmitted, setContactSubmitted] = useState(false);
-    const [selectedGuide, setSelectedGuide] = useState(null);
 
     const tabs = [
         { id: 'faq', name: 'FAQ', icon: FiHelpCircle },
@@ -139,11 +138,6 @@ const Help = () => {
             return;
         }
 
-        // Simulate form submission
-        console.log('Contact form submitted:', contactForm);
-        
-        // In a real app, you would send this to your backend
-        // For now, we'll just show a success message
         setContactSubmitted(true);
         
         // Reset form after 3 seconds
@@ -158,8 +152,7 @@ const Help = () => {
         }, 3000);
     };
 
-    const handleGuideView = (guide) => {
-        // Navigate to the dedicated Guides section
+    const handleGuideView = () => {
         navigate('/dashboard/guides');
     };
 

@@ -34,8 +34,8 @@ const AddExpenseModal = ({ isOpen, onClose }) => {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
-            <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center" role="dialog" aria-modal="true" aria-label="Add Transaction" onClick={onClose}>
+            <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md" onClick={(e) => e.stopPropagation()}>
                 <h2 className="text-2xl font-bold mb-4 text-gray-800">Add Transaction</h2>
                 {error && <p className="bg-red-100 text-red-700 p-2 rounded mb-4">{error}</p>}
                 <form onSubmit={handleSubmit}>

@@ -1,18 +1,13 @@
 import React, { useState, useMemo } from 'react';
 import { useExpenses } from '../../contexts/ExpenseContext.jsx';
 import Loading from '../Loading';
-import { FiTrendingUp, FiDollarSign, FiActivity, FiArrowDown, FiPieChart, FiBarChart2, FiCalendar, FiDownload } from 'react-icons/fi';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, PieChart, Pie, Cell, LineChart, Line, ResponsiveContainer } from 'recharts';
+import { FiTrendingUp, FiDollarSign, FiActivity, FiArrowDown, FiPieChart, FiBarChart2, FiDownload } from 'react-icons/fi';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 
 const Reports = () => {
     const { expenses, loading } = useExpenses();
     const [activeTab, setActiveTab] = useState('overview');
 
-    if (loading) {
-        return <Loading message="Loading financial reports..." />;
-    }
-
-    // Advanced analytics calculations
     const analytics = useMemo(() => {
         const totalIncome = expenses.filter(e => e.type === 'income').reduce((sum, e) => sum + e.amount, 0);
         const totalExpense = expenses.filter(e => e.type === 'expense').reduce((sum, e) => sum + e.amount, 0);
@@ -70,6 +65,10 @@ const Reports = () => {
         { id: 'categories', label: 'Categories', icon: FiPieChart },
         { id: 'insights', label: 'Insights', icon: FiTrendingUp }
     ];
+
+    if (loading) {
+        return <Loading message="Loading financial reports..." />;
+    }
 
     return (
         <div className="p-4 sm:p-6 space-y-6">
@@ -201,7 +200,7 @@ const Reports = () => {
                                     <XAxis dataKey="month" />
                                     <YAxis tickFormatter={(value) => `₹${value.toLocaleString('en-IN')}`} />
                                     <Tooltip 
-                                        formatter={(value) => [`₹${value.toLocaleString('en-IN')}`, value === analytics.monthlyTrends[0]?.income ? 'Income' : 'Expense']}
+                                        formatter={(value, name) => [`₹${value.toLocaleString('en-IN')}`, name === 'income' ? 'Income' : 'Expense']}
                                         labelFormatter={(label) => `Month: ${label}`}
                                     />
                                     <Bar dataKey="income" fill="#22c55e" name="Income" />

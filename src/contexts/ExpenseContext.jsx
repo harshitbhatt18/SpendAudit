@@ -53,24 +53,20 @@ export const ExpenseProvider = ({ children }) => {
     }, [expenses]);
 
     const addExpense = async (expenseData) => {
-        if (!currentUser) return;
-        try {
-            const { data, error } = await supabase
-                .from('expenses')
-                .insert([{ ...expenseData, user_id: currentUser.id }])
-                .select();
+        if (!currentUser) throw new Error('You must be logged in to add a transaction.');
+        const { data, error } = await supabase
+            .from('expenses')
+            .insert([{ ...expenseData, user_id: currentUser.id }])
+            .select();
 
-            if (error) {
-                throw error;
-            }
-
-            if (data) {
-                setExpenses(prev => [data[0], ...prev]);
-            }
-            return data;
-        } catch (error) {
-            console.error('Error adding expense:', error.message);
+        if (error) {
+            throw error;
         }
+
+        if (data) {
+            setExpenses(prev => [data[0], ...prev]);
+        }
+        return data;
     };
 
     const value = {

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Loading from './Loading';
-import { FiHome, FiTrendingUp, FiBox, FiDollarSign, FiSettings, FiHelpCircle, FiMenu, FiMoreHorizontal, FiArrowUp, FiArrowDown, FiLogOut, FiPlus, FiBook } from 'react-icons/fi';
-import { MdOutlineInventory, MdOutlineAccountBalanceWallet, MdAssessment } from "react-icons/md";
+import { FiHome, FiBox, FiDollarSign, FiSettings, FiHelpCircle, FiMenu, FiMoreHorizontal, FiArrowUp, FiArrowDown, FiLogOut, FiPlus, FiBook } from 'react-icons/fi';
+import { MdAssessment } from "react-icons/md";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend, LineChart, Line } from 'recharts';
 import { useAuth } from '../contexts/AuthContext';
 import { useExpenses } from '../contexts/ExpenseContext.jsx';
@@ -109,7 +109,7 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
     );
 };
 
-const StatCard = ({ title, amount, change, changeType, icon, bgColor, textColor }) => (
+const StatCard = ({ title, amount, change, changeType, bgColor, textColor }) => (
     <div className={`p-4 rounded-lg shadow-md ${bgColor} ${textColor} transform transition-all duration-300 hover:scale-105 hover:shadow-xl cursor-pointer`}>
         <div className="flex justify-between items-start">
             <div>
@@ -305,7 +305,7 @@ const Dashboard = ({ children }) => {
             <Sidebar isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
             <div className="flex-1 flex flex-col overflow-hidden">
                 <header className="flex justify-between items-center p-4 bg-white border-b">
-                    <button className="text-gray-500 focus:outline-none sm:hidden" onClick={() => setSidebarOpen(true)}>
+                    <button className="text-gray-500 focus:outline-none sm:hidden" onClick={() => setSidebarOpen(true)} aria-label="Open navigation menu">
                         <FiMenu size={24} />
                     </button>
                     <div className="flex items-center ml-auto">

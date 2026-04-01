@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useExpenses } from '../../contexts/ExpenseContext.jsx';
 import Loading from '../Loading';
-import { FiFilter, FiSearch, FiArrowUpRight, FiArrowDownLeft, FiCalendar, FiTrendingUp, FiTrendingDown } from 'react-icons/fi';
+import { FiSearch, FiArrowUpRight, FiArrowDownLeft, FiCalendar, FiTrendingUp, FiTrendingDown } from 'react-icons/fi';
 
 const TransactionHistory = () => {
     const { expenses, loading } = useExpenses();
@@ -11,7 +11,7 @@ const TransactionHistory = () => {
 
     // Filter and search transactions
     const filteredTransactions = expenses.filter(expense => {
-        const matchesSearch = expense.category.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesSearch = (expense.category || '').toLowerCase().includes(searchTerm.toLowerCase());
         const matchesFilter = filterType === 'all' || expense.type === filterType;
         return matchesSearch && matchesFilter;
     });
